@@ -1,0 +1,8 @@
+import axiosClient from '../../service/axiosClient';
+
+export const todoApi = {
+  getAll: (params = {}) => axiosClient.get('/toDos', { params }), // {search, status}
+  create: (data) => axiosClient.post('/toDos', data), // { title, description }
+  update: (id, data) => axiosClient.put(`/toDos/${id}`, data), // { title?, description?, status? }
+  remove: (id) => axiosClient.delete(`/toDos/${id}`),
+};
