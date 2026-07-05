@@ -33,9 +33,18 @@ export function useTodos({ search, status } = {}) {
   };
 
   const updateTodo = async (id, data) => {
-    const updated = await todoApi.update(id, data); // { title?, description?, status? }
-    setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)));
-  };
+  try {
+    const res = await todoApi.update(id, data);
+    console.log("UPDATE SUCCESS - res:", res); // 👈 thêm dòng này
+    setTodos((prev) => prev.map((t) => (t.id === id ? res : t)));
+    return res;
+  } catch (err) {
+    console.log("UPDATE ERROR - err:", err); // 👈 thêm dòng này
+    console.log("UPDATE ERROR - err.response:", err.response);
+    console.log("UPDATE ERROR - err.response?.data:", err.response?.data);
+    throw err.response?.data;
+  }
+};
 
   const toggleTodo = async (todo) => {
     const newStatus =
@@ -49,15 +58,15 @@ export function useTodos({ search, status } = {}) {
   };
 
   const reorderTodos = async (reordered) => {
-  setTodos(reordered);
+    setTodos(reordered);
 
-  const payload = reordered.map((todo, index) => ({
-    id: todo.id,
-    position: index + 1,
-  }));
+    const payload = reordered.map((todo, index) => ({
+      id: todo.id,
+      position: index + 1,
+    }));
 
-  await todoApi.reorder(payload);
-};
+    await todoApi.reorder(payload);
+  };
 
   return {
     todos,

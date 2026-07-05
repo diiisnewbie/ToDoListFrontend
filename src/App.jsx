@@ -6,6 +6,7 @@ import { TODO_STATUS } from "./constants/todoStatus";
 import { useState } from "react";
 import { useDebounce } from "./features/todos/hooks/useDebounce";
 import TodoFilter from "./features/todos/components/TodoFilter";
+import TodoDetailModal from "./features/todos/components/TodoDetailModal";
 
 export default function App() {
   const [searchInput, setSearchInput] = useState("");

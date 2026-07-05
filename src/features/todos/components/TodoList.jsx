@@ -1,8 +1,11 @@
 import { DndContext } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import { useState } from "react";
+
 import TodoItem from "./Todoitem";
 import TodoColumn from "./ToDoColumn";
-import { todoApi } from "../api"; // ⚠️ nhớ chỉnh path đúng
+import TodoDetailModal from "./TodoDetailModal";
+import { todoApi } from "../api";
 
 export default function TodoList({
   todos,
@@ -12,8 +15,9 @@ export default function TodoList({
   onToggle,
   onUpdate,
   onDelete,
-  reorderTodos,
 }) {
+  const [selectedTodo, setSelectedTodo] = useState(null);
+
   if (loading) {
     return (
       <p className="py-10 text-center text-sm text-slate-400">Đang tải...</p>
@@ -34,101 +38,79 @@ export default function TodoList({
   const handleDragEnd = async (event) => {
     const { active, over } = event;
 
-    if (!over) return;
+    if (!over || active.id === over.id) return;
 
     const activeTodo = todos.find((t) => t.id === active.id);
     const overTodo = todos.find((t) => t.id === over.id);
 
     if (!activeTodo || !overTodo) return;
 
-    const sameColumn = activeTodo.status === overTodo.status;
+    if (activeTodo.status !== overTodo.status) return;
 
-    let updatedTodos = [...todos];
+    // 🔥 lấy list theo position (SOURCE OF TRUTH)
+    const columnTasks = todos
+      .filter((t) => t.status === activeTodo.status)
+      .sort((a, b) => a.position - b.position);
 
-    // =========================
-    // CASE 1: SAME COLUMN (reorder)
-    // =========================
-    if (sameColumn) {
-      const columnTasks = todos.filter((t) => t.status === activeTodo.status);
+    const activeIndex = columnTasks.findIndex((t) => t.id === active.id);
+    const overIndex = columnTasks.findIndex((t) => t.id === over.id);
 
-      const oldIndex = columnTasks.findIndex((t) => t.id === active.id);
-      const newIndex = columnTasks.findIndex((t) => t.id === over.id);
+    if (activeIndex === -1 || overIndex === -1) return;
 
-      const reorderedColumn = arrayMove(columnTasks, oldIndex, newIndex).map(
-        (todo, index) => ({
-          ...todo,
-          position: index + 1,
-        }),
-      );
+    const reordered = arrayMove(columnTasks, activeIndex, overIndex).map(
+      (item, index) => ({
+        ...item,
+        position: index + 1,
+      }),
+    );
 
-      updatedTodos = todos.map((t) => {
-        const updated = reorderedColumn.find((r) => r.id === t.id);
-        return updated ?? t;
-      });
+    // 🔥 merge lại toàn bộ todos
+    const newTodos = todos.map((t) => {
+      const updated = reordered.find((r) => r.id === t.id);
+      return updated ?? t;
+    });
 
-      setTodos(updatedTodos);
+    setTodos(newTodos);
 
-      const payload = reorderedColumn.map((t) => ({
+    await todoApi.reorder(
+      reordered.map((t) => ({
         id: t.id,
         position: t.position,
-      }));
-
-      await todoApi.reorder(payload);
-    }
-
-    // =========================
-    // CASE 2: MOVE BETWEEN COLUMNS
-    // =========================
-    else {
-      updatedTodos = todos.map((t) =>
-        t.id === active.id ? { ...t, status: overTodo.status } : t,
-      );
-
-      await onUpdate(active.id, {
-        status: overTodo.status,
-      });
-    }
-
-    setTodos(updatedTodos);
+      })),
+    );
   };
-
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="grid grid-cols-3 gap-6">
-        <TodoColumn id="TODO" title="📋 To Do" tasks={getTasks("TODO")}>
-          {getTasks("TODO").map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              {...{ onToggle, onUpdate, onDelete }}
-            />
-          ))}
-        </TodoColumn>
-
-        <TodoColumn
-          id="IN_PROGRESS"
-          title="🚀 In Progress"
-          tasks={getTasks("IN_PROGRESS")}
-        >
-          {getTasks("IN_PROGRESS").map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              {...{ onToggle, onUpdate, onDelete }}
-            />
-          ))}
-        </TodoColumn>
-
-        <TodoColumn id="DONE" title="✅ Done" tasks={getTasks("DONE")}>
-          {getTasks("DONE").map((todo) => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              {...{ onToggle, onUpdate, onDelete }}
-            />
-          ))}
-        </TodoColumn>
+        {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
+          <TodoColumn
+            key={status}
+            id={status}
+            title={status}
+            tasks={getTasks(status)}
+          >
+            {getTasks(status).map((todo) => (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                onToggle={onToggle}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+                onClick={() => setSelectedTodo(todo)}
+              />
+            ))}
+          </TodoColumn>
+        ))}
       </div>
+
+      {/* ✅ MOVE MODAL OUTSIDE GRID */}
+      {selectedTodo && (
+        <TodoDetailModal
+          todo={selectedTodo}
+          onClose={() => setSelectedTodo(null)}
+          onSave={onUpdate}
+        />
+      )}
     </DndContext>
   );
 }
