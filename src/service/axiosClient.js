@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'https://java-application-1pv9.onrender.com',
+  baseURL: 'http://localhost:8080',
   headers: { 'Content-Type': 'application/json' },
 });
+
+//https://java-application-1pv9.onrender.com
 
 // Backend luôn bọc trong { code, message, result } => unwrap sẵn ở đây
 axiosClient.interceptors.response.use(

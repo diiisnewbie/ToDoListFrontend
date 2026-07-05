@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { todoApi } from '../api';
-import { TODO_STATUS } from '../../../constants/todoStatus';
+import { useState, useEffect, useCallback } from "react";
+import { todoApi } from "../api";
+import { TODO_STATUS } from "../../../constants/todoStatus";
 
 export function useTodos({ search, status } = {}) {
   const [todos, setTodos] = useState([]);
@@ -13,7 +13,7 @@ export function useTodos({ search, status } = {}) {
     try {
       const data = await todoApi.getAll({
         search: search || undefined,
-        status: status && status !== 'ALL' ? status : undefined,
+        status: status && status !== "ALL" ? status : undefined,
       });
       setTodos(data || []);
     } catch (err) {
@@ -38,7 +38,8 @@ export function useTodos({ search, status } = {}) {
   };
 
   const toggleTodo = async (todo) => {
-    const newStatus = todo.status === TODO_STATUS.DONE ? TODO_STATUS.TODO : TODO_STATUS.DONE;
+    const newStatus =
+      todo.status === TODO_STATUS.DONE ? TODO_STATUS.TODO : TODO_STATUS.DONE;
     await updateTodo(todo.id, { status: newStatus });
   };
 
@@ -47,5 +48,27 @@ export function useTodos({ search, status } = {}) {
     setTodos((prev) => prev.filter((t) => t.id !== id));
   };
 
-  return { todos, loading, error, addTodo, updateTodo, toggleTodo, deleteTodo, refetch: fetchTodos };
+  const reorderTodos = async (reordered) => {
+  setTodos(reordered);
+
+  const payload = reordered.map((todo, index) => ({
+    id: todo.id,
+    position: index + 1,
+  }));
+
+  await todoApi.reorder(payload);
+};
+
+  return {
+    todos,
+    setTodos,
+    loading,
+    error,
+    addTodo,
+    updateTodo,
+    toggleTodo,
+    deleteTodo,
+    reorderTodos,
+    refetch: fetchTodos,
+  };
 }

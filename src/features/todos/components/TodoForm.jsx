@@ -48,16 +48,6 @@ export default function TodoForm({ mode = 'create', initialValues, onSubmit, onC
         maxLength={255}
         required
       />
-      <Input
-        as="textarea"
-        label="Mô tả"
-        name="description"
-        placeholder="Chi tiết thêm (không bắt buộc)"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        error={errors.description}
-        maxLength={255}
-      />
       {mode === 'edit' && (
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-slate-700">Trạng thái</label>
