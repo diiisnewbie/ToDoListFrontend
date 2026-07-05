@@ -1,4 +1,4 @@
-import TodoItem from './TodoItem';
+import Todoitem from './Todoitem';
 
 export default function TodoList({ todos, loading, error, onToggle, onUpdate, onDelete }) {
   if (loading) {
@@ -24,7 +24,7 @@ export default function TodoList({ todos, loading, error, onToggle, onUpdate, on
   return (
     <div className="flex flex-col gap-3">
       {todos.filter(Boolean).map((todo) => (
-        <TodoItem key={todo.id} todo={todo} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />
+        <Todoitem key={todo.id} todo={todo} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />
       ))}
     </div>
   );
