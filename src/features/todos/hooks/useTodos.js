@@ -68,6 +68,15 @@ export function useTodos({ search, status } = {}) {
     await todoApi.reorder(payload);
   };
 
+  const moveTodo = async (id, targetStatus, targetPosition) => {
+  await todoApi.move(id, {
+    targetStatus,
+    targetPosition,
+  });
+
+  await fetchTodos();
+};
+
   return {
     todos,
     setTodos,
@@ -78,6 +87,7 @@ export function useTodos({ search, status } = {}) {
     toggleTodo,
     deleteTodo,
     reorderTodos,
+    moveTodo,
     refetch: fetchTodos,
   };
 }

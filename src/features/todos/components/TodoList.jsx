@@ -15,6 +15,7 @@ export default function TodoList({
   onToggle,
   onUpdate,
   onDelete,
+  moveTodo,
 }) {
   const [selectedTodo, setSelectedTodo] = useState(null);
 
@@ -35,36 +36,56 @@ export default function TodoList({
       .filter((t) => t.status === status)
       .sort((a, b) => a.position - b.position);
 
-  const handleDragEnd = async (event) => {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) return;
+  const handleDragEnd = async ({ active, over }) => {
+    if (!over) return;
 
     const activeTodo = todos.find((t) => t.id === active.id);
+    if (!activeTodo) return;
+
+    // ===============================
+    // DROP VÀO COLUMN
+    // ===============================
+    if (over.id === "TODO" || over.id === "IN_PROGRESS" || over.id === "DONE") {
+      if (activeTodo.status === over.id) return;
+
+      await moveTodo(activeTodo.id, over.id, getTasks(over.id).length + 1);
+
+      return;
+    }
+
+    // ===============================
+    // DROP LÊN TASK
+    // ===============================
     const overTodo = todos.find((t) => t.id === over.id);
 
-    if (!activeTodo || !overTodo) return;
+    if (!overTodo) return;
 
-    if (activeTodo.status !== overTodo.status) return;
+    // khác column
+    if (activeTodo.status !== overTodo.status) {
+      await moveTodo(activeTodo.id, overTodo.status, overTodo.position);
 
-    // 🔥 lấy list theo position (SOURCE OF TRUTH)
-    const columnTasks = todos
-      .filter((t) => t.status === activeTodo.status)
-      .sort((a, b) => a.position - b.position);
+      return;
+    }
 
-    const activeIndex = columnTasks.findIndex((t) => t.id === active.id);
-    const overIndex = columnTasks.findIndex((t) => t.id === over.id);
+    // ===============================
+    // CÙNG COLUMN -> REORDER
+    // ===============================
 
-    if (activeIndex === -1 || overIndex === -1) return;
+    const columnTasks = getTasks(activeTodo.status);
 
-    const reordered = arrayMove(columnTasks, activeIndex, overIndex).map(
+    const oldIndex = columnTasks.findIndex((t) => t.id === active.id);
+
+    const newIndex = columnTasks.findIndex((t) => t.id === over.id);
+
+    if (oldIndex === newIndex) return;
+
+    const reordered = arrayMove(columnTasks, oldIndex, newIndex).map(
       (item, index) => ({
         ...item,
         position: index + 1,
       }),
     );
 
-    // 🔥 merge lại toàn bộ todos
     const newTodos = todos.map((t) => {
       const updated = reordered.find((r) => r.id === t.id);
       return updated ?? t;

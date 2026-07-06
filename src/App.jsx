@@ -22,6 +22,7 @@ export default function App() {
     toggleTodo,
     deleteTodo,
     reorderTodos,
+    moveTodo
   } = useTodos({ search: debouncedSearch, status: statusFilter });
   const doneCount = todos.filter((t) => t?.status === TODO_STATUS.DONE).length;
   return (
@@ -45,6 +46,7 @@ export default function App() {
           onUpdate={updateTodo}
           onDelete={deleteTodo}
           reorderTodos={reorderTodos}
+          moveTodo={moveTodo}
         />
       </main>
     </div>

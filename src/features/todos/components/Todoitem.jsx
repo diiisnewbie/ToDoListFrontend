@@ -1,31 +1,40 @@
 import { useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 import Badge from "../../../components/ui/Badge";
 import Button from "../../../components/ui/Button";
 import StatusSelect from "./StatusSelect";
 import TodoForm from "./TodoForm";
 import { TODO_STATUS } from "../../../constants/todoStatus";
-import { CSS } from "@dnd-kit/utilities";
-import { useSortable } from "@dnd-kit/sortable";
 
-export default function Todoitem({
+export default function TodoItem({
   todo,
   onToggle,
   onUpdate,
   onDelete,
   onClick,
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: todo.id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: todo.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    opacity: isDragging ? 0.5 : 1,
   };
 
   const [editing, setEditing] = useState(false);
 
-  const isDone = todo.status === TODO_STATUS.DONE; // 👈 chỉ khai báo 1 lần
-  const isOverdue = todo.overdue && !isDone;
+  const isDone = todo.status === TODO_STATUS.DONE;
 
   if (editing) {
     return (
@@ -45,74 +54,85 @@ export default function Todoitem({
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      className={`flex items-start gap-3 rounded-xl border p-4 bg-white ${
-        isOverdue ? "border-red-300 bg-red-50/40" : "border-slate-200"
-      }`}
+      className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm cursor-pointer"
+      onClick={() => onClick?.(todo)}
     >
-      {/* DRAG HANDLE ONLY */}
-      <div
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing px-2 text-slate-400"
-      >
-        ⠿
-      </div>
+      <div className="flex items-start gap-3">
 
-      {/* CLICK AREA (MODAL) */}
-      <div
-        className="flex-1 min-w-0"
-        onClick={() => onClick?.(todo)}
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <h3
-            className={`truncate text-sm font-medium ${
-              isDone ? "text-slate-400 line-through" : "text-slate-900"
+        {/* Drag Handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-700 mt-1"
+        >
+          ☰
+        </div>
+
+        {/* Check */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle(todo);
+          }}
+          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2
+            ${
+              isDone
+                ? "border-emerald-500 bg-emerald-500"
+                : "border-slate-300"
             }`}
-          >
-            {todo.title}
-          </h3>
-          <Badge status={todo.priority} />
+        >
+          {isDone && (
+            <svg viewBox="0 0 12 12" className="h-3 w-3 fill-white">
+              <path d="M4.5 8.5 1.8 5.8l1-1L4.5 6.5l4.7-4.7 1 1z" />
+            </svg>
+          )}
+        </button>
 
-          {isOverdue && (
-            <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
-              Quá hạn
-            </span>
+        {/* Content */}
+        <div className="flex-1">
+
+          <div className="flex items-center gap-2">
+            <h3
+              className={`font-medium ${
+                isDone ? "line-through text-slate-400" : ""
+              }`}
+            >
+              {todo.title}
+            </h3>
+
+            <Badge status={todo.priority} />
+          </div>
+
+          {todo.description && (
+            <p className="text-sm text-slate-500 mt-1">
+              {todo.description}
+            </p>
           )}
         </div>
 
-        {todo.description && (
-          <p
-            className={`mt-1 text-sm ${
-              isDone ? "text-slate-400" : "text-slate-600"
-            }`}
+        {/* Actions */}
+        <div
+          className="flex gap-2"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <StatusSelect
+            value={todo.status}
+            onChange={(status) =>
+              onUpdate(todo.id, {
+                status,
+              })
+            }
+          />
+
+
+          <Button
+            variant="danger"
+            size="icon"
+            onClick={() => onDelete(todo.id)}
           >
-            {todo.description}
-          </p>
-        )}
-      </div>
-
-      {/* ACTIONS */}
-      <div className="flex shrink-0 items-center gap-1.5">
-        <StatusSelect
-          value={todo.status}
-          onChange={(status) => onUpdate(todo.id, { status })}
-        />
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setEditing(true)}
-        >
-          ✏️
-        </Button>
-
-        <Button
-          variant="danger"
-          size="icon"
-          onClick={() => onDelete(todo.id)}
-        >
-          🗑️
-        </Button>
+            🗑️
+          </Button>
+        </div>
       </div>
     </div>
   );

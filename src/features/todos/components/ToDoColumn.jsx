@@ -4,29 +4,40 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-export default function TodoColumn({ id, title, tasks, children }) {
-  const { setNodeRef, isOver } = useDroppable({ id });
+export default function TodoColumn({
+  id,
+  title,
+  tasks,
+  children,
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+  });
 
   return (
     <div
       ref={setNodeRef}
-      className={`bg-slate-100 rounded-lg p-4 flex flex-col h-[calc(100vh-160px)] ${
-        isOver ? "bg-blue-100" : ""
-      }`}
+      className={`
+        rounded-lg p-4 min-h-[600px] transition-all
+        ${
+          isOver
+            ? "bg-blue-100 border-2 border-blue-500"
+            : "bg-slate-100 border-2 border-transparent"
+        }
+      `}
     >
-      <h2 className="text-lg font-bold mb-4 shrink-0">
+      <h2 className="text-lg font-bold mb-4">
         {title} ({tasks.length})
       </h2>
 
-      {/* 👇 phần scroll riêng, header luôn cố định phía trên */}
-      <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
-        <SortableContext
-          items={tasks.map((task) => task.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="flex flex-col gap-3">{children}</div>
-        </SortableContext>
-      </div>
+      <SortableContext
+        items={tasks.map((task) => task.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="flex flex-col gap-3 min-h-[500px]">
+          {children}
+        </div>
+      </SortableContext>
     </div>
   );
 }
