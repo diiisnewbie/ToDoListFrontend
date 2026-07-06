@@ -23,7 +23,9 @@ export default function Todoitem({
   };
 
   const [editing, setEditing] = useState(false);
-  const isDone = todo.status === TODO_STATUS.DONE;
+
+  const isDone = todo.status === TODO_STATUS.DONE; // 👈 chỉ khai báo 1 lần
+  const isOverdue = todo.overdue && !isDone;
 
   if (editing) {
     return (
@@ -44,7 +46,9 @@ export default function Todoitem({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4"
+      className={`flex items-start gap-3 rounded-xl border p-4 bg-white ${
+        isOverdue ? "border-red-300 bg-red-50/40" : "border-slate-200"
+      }`}
     >
       {/* DRAG HANDLE ONLY */}
       <div
@@ -68,6 +72,12 @@ export default function Todoitem({
             {todo.title}
           </h3>
           <Badge status={todo.priority} />
+
+          {isOverdue && (
+            <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+              Quá hạn
+            </span>
+          )}
         </div>
 
         {todo.description && (
@@ -88,6 +98,13 @@ export default function Todoitem({
           onChange={(status) => onUpdate(todo.id, { status })}
         />
 
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setEditing(true)}
+        >
+          ✏️
+        </Button>
 
         <Button
           variant="danger"
