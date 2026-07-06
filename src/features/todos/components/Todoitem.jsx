@@ -14,6 +14,7 @@ export default function TodoItem({
   onUpdate,
   onDelete,
   onClick,
+  dragDisabled,
 }) {
   const {
     attributes,
@@ -24,6 +25,7 @@ export default function TodoItem({
     isDragging,
   } = useSortable({
     id: todo.id,
+    disabled: dragDisabled,
   });
 
   const style = {
@@ -58,12 +60,16 @@ export default function TodoItem({
       onClick={() => onClick?.(todo)}
     >
       <div className="flex items-start gap-3">
-
         {/* Drag Handle */}
         <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-700 mt-1"
+          {...(!dragDisabled ? attributes : {})}
+          {...(!dragDisabled ? listeners : {})}
+          className={`mt-1 text-slate-400
+    ${
+      dragDisabled
+        ? "cursor-not-allowed opacity-40"
+        : "cursor-grab active:cursor-grabbing hover:text-slate-700"
+    }`}
         >
           ☰
         </div>
@@ -76,9 +82,7 @@ export default function TodoItem({
           }}
           className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2
             ${
-              isDone
-                ? "border-emerald-500 bg-emerald-500"
-                : "border-slate-300"
+              isDone ? "border-emerald-500 bg-emerald-500" : "border-slate-300"
             }`}
         >
           {isDone && (
@@ -90,7 +94,6 @@ export default function TodoItem({
 
         {/* Content */}
         <div className="flex-1">
-
           <div className="flex items-center gap-2">
             <h3
               className={`font-medium ${
@@ -104,17 +107,18 @@ export default function TodoItem({
           </div>
 
           {todo.description && (
-            <p className="text-sm text-slate-500 mt-1">
-              {todo.description}
+            <p className="text-sm text-slate-500 mt-1">{todo.description}</p>
+          )}
+
+          {dragDisabled && (
+            <p className="text-[11px] text-slate-400 mt-1">
+              Chỉ có thể kéo khi đang sắp xếp theo Position.
             </p>
           )}
         </div>
 
         {/* Actions */}
-        <div
-          className="flex gap-2"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <StatusSelect
             value={todo.status}
             onChange={(status) =>
@@ -123,7 +127,6 @@ export default function TodoItem({
               })
             }
           />
-
 
           <Button
             variant="danger"

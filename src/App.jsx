@@ -12,6 +12,8 @@ export default function App() {
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebounce(searchInput, 400);
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("POSITION");
+  const [sortDirection, setSortDirection] = useState("ASC");
   const {
     todos,
     setTodos,
@@ -22,8 +24,13 @@ export default function App() {
     toggleTodo,
     deleteTodo,
     reorderTodos,
-    moveTodo
-  } = useTodos({ search: debouncedSearch, status: statusFilter });
+    moveTodo,
+  } = useTodos({
+    search: debouncedSearch,
+    status: statusFilter,
+    sortBy,
+    sortDirection,
+  });
   const doneCount = todos.filter((t) => t?.status === TODO_STATUS.DONE).length;
   return (
     <div className="min-h-screen bg-slate-50">
@@ -37,6 +44,37 @@ export default function App() {
           statusValue={statusFilter}
           onStatusChange={setStatusFilter}
         />
+        <div className="flex gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium mb-1">Sort By</label>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="border rounded px-3 py-2"
+            >
+              <option value="POSITION">Position</option>
+              <option value="TITLE">Title</option>
+              <option value="PRIORITY">Priority</option>
+              <option value="DUE_DATE">Due Date</option>
+              <option value="CREATED_AT">Created At</option>
+              <option value="UPDATED_AT">Updated At</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Direction</label>
+
+            <select
+              value={sortDirection}
+              onChange={(e) => setSortDirection(e.target.value)}
+              className="border rounded px-3 py-2"
+            >
+              <option value="ASC">Ascending</option>
+              <option value="DESC">Descending</option>
+            </select>
+          </div>
+        </div>
         <TodoList
           todos={todos}
           setTodos={setTodos}
@@ -47,6 +85,7 @@ export default function App() {
           onDelete={deleteTodo}
           reorderTodos={reorderTodos}
           moveTodo={moveTodo}
+          sortBy={sortBy}
         />
       </main>
     </div>

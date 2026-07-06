@@ -16,8 +16,10 @@ export default function TodoList({
   onUpdate,
   onDelete,
   moveTodo,
+  sortBy,
 }) {
   const [selectedTodo, setSelectedTodo] = useState(null);
+  const enableDrag = sortBy === "POSITION";
 
   if (loading) {
     return (
@@ -31,10 +33,15 @@ export default function TodoList({
     );
   }
 
-  const getTasks = (status) =>
-    todos
-      .filter((t) => t.status === status)
-      .sort((a, b) => a.position - b.position);
+  const getTasks = (status) => {
+    const list = todos.filter((t) => t.status === status);
+
+    if (enableDrag) {
+      list.sort((a, b) => a.position - b.position);
+    }
+
+    return list;
+  };
 
   const handleDragEnd = async ({ active, over }) => {
     if (!over) return;
@@ -101,7 +108,7 @@ export default function TodoList({
     );
   };
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={enableDrag ? handleDragEnd : undefined}>
       <div className="grid grid-cols-3 gap-6">
         {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
           <TodoColumn
@@ -118,6 +125,7 @@ export default function TodoList({
                 onUpdate={onUpdate}
                 onDelete={onDelete}
                 onClick={() => setSelectedTodo(todo)}
+                dragDisabled={!enableDrag}
               />
             ))}
           </TodoColumn>
