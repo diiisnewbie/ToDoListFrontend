@@ -64,11 +64,11 @@ export default function TodoDetailModal({ todo, onClose, onSave }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-3 py-4 sm:px-4"
       onClick={onClose}
     >
       <div
-        className="bg-white w-[500px] p-6 rounded-xl space-y-3"
+        className="w-full max-w-[500px] space-y-3 overflow-y-auto rounded-xl bg-white p-4 shadow-xl sm:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-bold">Task Detail</h2>
@@ -79,12 +79,10 @@ export default function TodoDetailModal({ todo, onClose, onSave }) {
           <input
             value={form.title || ""}
             onChange={(e) => handleChange("title", e.target.value)}
-            className={`border p-2 w-full ${
-              errors.title ? "border-red-500" : ""
-            }`}
+            className={`w-full border p-2 ${errors.title ? "border-red-500" : ""}`}
           />
           {errors.title && (
-            <p className="text-red-500 text-sm">{errors.title}</p>
+            <p className="text-sm text-red-500">{errors.title}</p>
           )}
         </div>
 
@@ -94,7 +92,7 @@ export default function TodoDetailModal({ todo, onClose, onSave }) {
           <textarea
             value={form.description || ""}
             onChange={(e) => handleChange("description", e.target.value)}
-            className="border p-2 w-full"
+            className="w-full border p-2"
           />
         </div>
 
@@ -104,9 +102,7 @@ export default function TodoDetailModal({ todo, onClose, onSave }) {
           <select
             value={form.priority || ""}
             onChange={(e) => handleChange("priority", e.target.value)}
-            className={`border p-2 w-full ${
-              errors.priority ? "border-red-500" : ""
-            }`}
+            className={`w-full border p-2 ${errors.priority ? "border-red-500" : ""}`}
           >
             <option value="">Select priority</option>
             <option value="LOW">LOW</option>
@@ -114,7 +110,7 @@ export default function TodoDetailModal({ todo, onClose, onSave }) {
             <option value="HIGH">HIGH</option>
           </select>
           {errors.priority && (
-            <p className="text-red-500 text-sm">{errors.priority}</p>
+            <p className="text-sm text-red-500">{errors.priority}</p>
           )}
         </div>
 
@@ -126,13 +122,11 @@ export default function TodoDetailModal({ todo, onClose, onSave }) {
             min={today}
             value={form.dueDate || ""}
             onChange={(e) => handleChange("dueDate", e.target.value)}
-            className={`border p-2 w-full ${
-              errors.dueDate ? "border-red-500" : ""
-            }`}
+            className={`w-full border p-2 ${errors.dueDate ? "border-red-500" : ""}`}
           />
 
           {errors.dueDate && (
-            <p className="text-red-500 text-sm">{errors.dueDate}</p>
+            <p className="text-sm text-red-500">{errors.dueDate}</p>
           )}
         </div>
 
@@ -140,12 +134,14 @@ export default function TodoDetailModal({ todo, onClose, onSave }) {
         <p className="text-xs text-gray-400">Created: {todo.createdAt}</p>
 
         {/* ACTIONS */}
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose}>Cancel</button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+          <button onClick={onClose} className="rounded border px-3 py-2">
+            Cancel
+          </button>
 
           <button
             onClick={handleSave}
-            className="bg-blue-500 text-white px-3 py-1 rounded"
+            className="rounded bg-blue-500 px-3 py-2 text-white"
           >
             Save
           </button>

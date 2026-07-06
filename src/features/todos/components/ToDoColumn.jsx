@@ -4,12 +4,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-export default function TodoColumn({
-  id,
-  title,
-  tasks,
-  children,
-}) {
+export default function TodoColumn({ id, title, tasks, children }) {
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
@@ -17,16 +12,11 @@ export default function TodoColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`
-        rounded-lg p-4 min-h-[600px] transition-all
-        ${
-          isOver
-            ? "bg-blue-100 border-2 border-blue-500"
-            : "bg-slate-100 border-2 border-transparent"
-        }
-      `}
+      className={`min-h-[280px] rounded-2xl border p-3 transition-all sm:p-4 md:min-h-[520px] ${
+        isOver ? "border-blue-500 bg-blue-100" : "border-slate-200 bg-slate-50"
+      }`}
     >
-      <h2 className="text-lg font-bold mb-4">
+      <h2 className="mb-3 text-base font-bold text-slate-800 sm:text-lg">
         {title} ({tasks.length})
       </h2>
 
@@ -34,7 +24,7 @@ export default function TodoColumn({
         items={tasks.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
       >
-        <div className="flex flex-col gap-3 min-h-[500px]">
+        <div className="flex min-h-[220px] flex-col gap-3 md:min-h-[440px]">
           {children}
         </div>
       </SortableContext>

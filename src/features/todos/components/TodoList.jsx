@@ -109,7 +109,7 @@ export default function TodoList({
   };
   return (
     <DndContext onDragEnd={enableDrag ? handleDragEnd : undefined}>
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
         {["TODO", "IN_PROGRESS", "DONE"].map((status) => (
           <TodoColumn
             key={status}
@@ -132,7 +132,6 @@ export default function TodoList({
         ))}
       </div>
 
-      {/* ✅ MOVE MODAL OUTSIDE GRID */}
       {selectedTodo && (
         <TodoDetailModal
           todo={selectedTodo}

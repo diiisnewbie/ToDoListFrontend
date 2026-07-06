@@ -1,8 +1,13 @@
-import { TODO_STATUS, STATUS_LABEL } from '../../../constants/todoStatus';
+import { TODO_STATUS, STATUS_LABEL } from "../../../constants/todoStatus";
 
-export default function TodoFilter({ searchValue, onSearchChange, statusValue, onStatusChange }) {
+export default function TodoFilter({
+  searchValue,
+  onSearchChange,
+  statusValue,
+  onStatusChange,
+}) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
       <div className="relative flex-1">
         <svg
           viewBox="0 0 20 20"
@@ -15,16 +20,14 @@ export default function TodoFilter({ searchValue, onSearchChange, statusValue, o
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Tìm theo tiêu đề..."
-          className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm text-slate-900
-            placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500"
+          className="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
         />
       </div>
 
       <select
         value={statusValue}
         onChange={(e) => onStatusChange(e.target.value)}
-        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700
-          focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 sm:w-44"
+        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 lg:w-56"
       >
         <option value="ALL">Tất cả trạng thái</option>
         {Object.values(TODO_STATUS).map((status) => (
